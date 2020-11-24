@@ -1,1 +1,3 @@
+import './dependencies';
+
 import './vue';

@@ -8,7 +8,8 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1">
 
-  <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[0] %>">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[0] %>">
 </head>
 <body>
   <div id="contacts-client">
@@ -16,5 +17,9 @@
   </div>
 
   <script src="<%= htmlWebpackPlugin.files.js[0] %>"></script>
+  <script
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=<%= htmlWebpackPlugin.options.appVars.google.apiKey %>&libraries=places&callback=vue.dependencies.google.places.ready"
+  ></script>
 </body>
 </html>

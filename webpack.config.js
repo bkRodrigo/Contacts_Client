@@ -1,5 +1,7 @@
+require('dotenv').config();
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
@@ -42,6 +44,13 @@ module.exports = (env) => {
           ),
         },
         {
+          test: /\.(png|jpg|gif)$/,
+          loader: 'file-loader',
+          options: {
+            name: 'images/[name].[ext]',
+          },
+        },
+        {
           test: /\.css$/i,
           use: [
             MiniCssExtractPlugin.loader,
@@ -74,6 +83,16 @@ module.exports = (env) => {
         hash: true,
         template: './src/browser/index.html',
         filename: 'index.html',
+        appVars: {
+          google: {
+            apiKey: process.env.GOOGLE_API_KEY,
+          },
+        },
+      }),
+      new CopyPlugin({
+        patterns: [
+          { from: 'src/browser/images', to: 'images' },
+        ],
       }),
     ],
 
