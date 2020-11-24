@@ -37,6 +37,7 @@
 export default {
   data: () => ({
     autocomplete: null,
+
   }),
 
   computed: {
@@ -59,7 +60,23 @@ export default {
           (this.$refs.autocomplete),
           {types: ['geocode']}
       );
+      this.addGooglePlacesListener();
     },
+
+    addGooglePlacesListener() {
+      this.autocomplete.addListener('place_changed', () => this.placeChanged());
+    },
+
+    placeChanged() {
+      let place = this.autocomplete.getPlace();
+      let ac = place.address_components;
+      let lat = place.geometry.location.lat();
+      let lon = place.geometry.location.lng();
+      let city = ac[0]["short_name"];
+      debugger;
+
+      console.log(`The user picked ${city} with the coordinates ${lat}, ${lon}`);
+    }
   },
 }
 </script>
