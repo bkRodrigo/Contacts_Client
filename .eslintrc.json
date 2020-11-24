@@ -1,0 +1,27 @@
+{
+    "env": {
+        "browser": true,
+        "node": true,
+        "commonjs": true,
+        "es6": true
+    },
+    "extends": [
+        "plugin:vue/essential",
+        "airbnb-base"
+    ],
+    "parserOptions": {
+        "parser": "babel-eslint",
+        "ecmaVersion": 2020,
+        "sourceType": "module",
+        "allowImportExportEverywhere": true
+    },
+    "plugins": [
+        "vue"
+    ],
+    "rules": {
+        "one-var": "off",
+        "no-underscore-dangle": "off",
+        "no-plusplus": "off",
+        "prefer-destructuring": "off"
+    }
+}
