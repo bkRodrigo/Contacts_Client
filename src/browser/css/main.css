@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.modal {
+    transition: opacity 0.25s ease;
+}
+
+body.modal-active {
+    overflow-x: hidden;
+    overflow-y: visible !important;
+}
+
+@layer components {
+    .btn {
+        @apply inline-block px-5 py-3 rounded-lg text-sm tracking-wider font-sans font-semibold;
+    }
+
+    .btn:focus {
+        @apply outline-none ring;
+    }
+
+    .btn-primary {
+        @apply bg-blue-600 text-white;
+    }
+    .btn-primary:hover {
+        @apply bg-blue-500;
+    }
+    .btn-primary:active {
+        @apply bg-blue-700;
+    }
+
+    .btn-gray {
+        @apply bg-gray-400 text-gray-800;
+    }
+    .btn-gray:hover {
+        @apply bg-gray-300;
+    }
+    .btn-gray:active {
+        @apply bg-gray-500;
+    }
+}
