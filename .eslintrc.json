@@ -6,12 +6,13 @@
         "es6": true
     },
     "extends": [
-        "plugin:vue/essential",
-        "airbnb-base"
+        "airbnb-base",
+        "plugin:vue/essential"
     ],
+    "parser": "vue-eslint-parser",
     "parserOptions": {
         "parser": "babel-eslint",
-        "ecmaVersion": 2020,
+        "ecmaVersion": 2018,
         "sourceType": "module",
         "allowImportExportEverywhere": true
     },
@@ -22,6 +23,18 @@
         "one-var": "off",
         "no-underscore-dangle": "off",
         "no-plusplus": "off",
-        "prefer-destructuring": "off"
+        "prefer-destructuring": "off",
+        "vue/html-self-closing": [
+            "error",
+            {
+                "html": {
+                    "void": "never",
+                    "normal": "any",
+                    "component": "any"
+                },
+                "svg": "always",
+                "math": "always"
+            }
+        ]
     }
 }
