@@ -4,13 +4,14 @@ const path = require('path');
 
 const express = require('express');
 
-const app = express();
-/*
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-});
-*/
+const address = require('./address');
 
+const app = express();
+
+// Address routes
+app.use('/api/address', address);
+
+// Resolve statics here
 app.use('/', express.static(path.join(__dirname, '../../dist')));
 
 app.listen(process.env.APP_PORT, () => {

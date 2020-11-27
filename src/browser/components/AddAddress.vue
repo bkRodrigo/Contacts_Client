@@ -12,6 +12,7 @@
       <div class="w-full">
         <div class="flex flex-wrap -m-2 justify-center">
           <div class="p-2 w-3/4">
+            <!--Addresss search-->
             <div class="relative">
               <label for="address" class="leading-7 text-sm text-gray-600">
                 Search
@@ -30,34 +31,14 @@
                     py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
               >
             </div>
+            <!--Address search result-->
             <div
-                v-show="inputValue.length > 0 && address.streetAddress.length > 0"
+                v-show="saveEnabled"
                 class="px-6"
             >
-              <h2
-                  class="font-medium text-gray-900 tracking-widest text-sm"
-                  v-html="address.streetAddress || 'Unknown Address'"
-              ></h2>
-              <div class="leading-relaxed">
-                <ul>
-                  <li v-html="
-                    `${address.city}, ${address.state}`
-                  "></li>
-                  <li
-                      class="text-sm"
-                      v-html="address.country"
-                  ></li>
-                  <li
-                      class="text-sm"
-                      v-html="address.postalCode"
-                  ></li>
-                  <li
-                      class="text-sm font-mono italic"
-                      v-html="`lat: ${address.latitude}, lng: ${address.longitude}`"
-                  ></li>
-                </ul>
-              </div>
+              <address-label :address="address"></address-label>
             </div>
+            <!--Description-->
             <div class="relative">
               <label for="address" class="leading-7 text-sm text-gray-600">
                 Address Description (optional)
@@ -73,6 +54,32 @@
                     py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
               >
             </div>
+            <!--Add address-->
+            <div class="relative pt-4 w-full">
+              <label
+                  class="w-full block text-center leading-7 text-sm text-gray-600"
+              >
+                Add the address to the contact
+              </label>
+              <div class="w-full flex justify-center">
+                <button
+                    id="addAddress"
+                    @click="addAddress()"
+                    :class="{
+                      'btn-gray': !saveEnabled,
+                      'cursor-not-allowed': !saveEnabled,
+                      'btn-primary': saveEnabled,
+                      'cursor-wait': saveButton.saving,
+                    }"
+                    class="block btn"
+                >Add Address</button>
+              </div>
+              <message-label
+                  :show="saveButton.notification.show"
+                  :type="saveButton.notification.type"
+                  v-html="saveButton.notification.text"
+              ></message-label>
+            </div>
           </div>
         </div>
       </div>
@@ -81,8 +88,17 @@
 </template>
 
 <script>
+import ApiClient from '../services/ApiClient';
+import MessageLabel from './MessageLabel.vue';
+import AddressLabel from './AddressLabel.vue';
+
 export default {
   name: 'AddAddress',
+
+  components: {
+    MessageLabel,
+    AddressLabel,
+  },
 
   props: {
     startForm: {
@@ -95,9 +111,16 @@ export default {
     autocomplete: null,
     inputValue: '',
     inputDescription: '',
+    saveButton: {
+      saving: false,
+      notification: {
+        show: false,
+        type: '',
+        text: '',
+      },
+    },
     address: {
       streetAddress: '',
-      description: '',
       latitude: '',
       longitude: '',
       postalCode: '',
@@ -108,6 +131,9 @@ export default {
   }),
 
   computed: {
+    saveEnabled() {
+      return this.inputValue.length > 0 && this.address.streetAddress.length > 0;
+    },
     googleLoaded() {
       return this.$root.dependencies.google.places.loaded;
     },
@@ -123,6 +149,13 @@ export default {
       if (value) {
         this.inputDescription = '';
         this.$refs.autocompleteInput.focus();
+      }
+    },
+    saveEnabled(value) {
+      if (value) {
+        this.saveButton.notification.type = '';
+        this.saveButton.notification.text = '';
+        this.saveButton.notification.show = false;
       }
     },
   },
@@ -182,6 +215,7 @@ export default {
           {},
         );
 
+      this.inputValue = streetAddr || this.inputValue;
       this.address.streetAddress = streetAddr ? streetAddr.split(',')[0] : 'Unknown Address';
       this.address.latitude = lat;
       this.address.longitude = lon;
@@ -200,6 +234,53 @@ export default {
       this.address.city = '';
       this.address.state = '';
       this.address.country = '';
+    },
+
+    addAddress() {
+      const vm = this;
+
+      if (!this.saveEnabled) {
+        this.saveButton.notification.type = 'warning';
+        this.saveButton.notification.text = 'You have not specified an address yet';
+        this.saveButton.notification.show = true;
+        return;
+      }
+      if (this.saveButton.saving) {
+        this.saveButton.notification.type = 'default';
+        this.saveButton.notification.text = 'The address is saving, please wait';
+        this.saveButton.notification.show = true;
+        return;
+      }
+      this.saveButton.saving = true;
+      ApiClient.post(
+        '/api/address',
+        {
+          street_address: this.address.streetAddress,
+          description: this.inputDescription,
+          latitude: this.address.latitude,
+          longitude: this.address.longitude,
+          postal_code: this.address.postalCode,
+          city: this.address.city,
+          state: this.address.state,
+          country: this.address.country,
+        },
+      ).then((res) => {
+        if (res.data.error) {
+          vm.$refs.autocompleteInput.focus();
+          vm.focusAutocompleteInput();
+          return;
+        }
+
+        this.$parent.$emit('close-modal', {
+          emit: {
+            name: 'address-created',
+            data: res.data.data.address,
+          },
+        });
+      }).catch(() => {
+        vm.$refs.autocompleteInput.focus();
+        vm.focusAutocompleteInput();
+      });
     },
   },
 };

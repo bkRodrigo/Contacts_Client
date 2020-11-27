@@ -16,7 +16,7 @@
           @click="toggleModal()"
           class="absolute w-full h-full bg-white opacity-95"></div>
 
-      <div class="fixed bg-gray-300 lg:w-1/2 md:w-2/3 mx-auto h-full z-50 overflow-y-auto bg-white">
+      <div class="fixed bg-gray-200 lg:w-1/2 md:w-2/3 mx-auto h-full z-50 overflow-y-auto bg-white">
 
         <div
             @click="toggleModal()"
@@ -78,6 +78,8 @@ export default {
     document.addEventListener('keydown', (event) => {
       vm.keyPress(event);
     });
+
+    this.$on('close-modal', this.closeModalEvent);
   },
 
   methods: {
@@ -96,6 +98,15 @@ export default {
         isEscape = evt.keyCode === 27;
       }
       if (isEscape) {
+        this.toggleModal();
+      }
+    },
+
+    closeModalEvent(eventData) {
+      if (eventData && eventData.emit && eventData.emit.name) {
+        this.$parent.$emit(eventData.emit.name, { data: eventData.emit.data || {} });
+      }
+      if (this.open) {
         this.toggleModal();
       }
     },
