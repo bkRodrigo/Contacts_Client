@@ -60,7 +60,7 @@ export default {
         return false;
       }
 
-      return this.month >= 0 && this.month < 12;
+      return this.month >= 0 && this.month <= 12;
     },
     dayValid() {
       if (!this.monthValid) {
