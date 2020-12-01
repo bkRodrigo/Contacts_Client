@@ -7,7 +7,7 @@
         </label>
         <debounced-input
             id="bi-firstname"
-            placeholder="your-email@gmail.com"
+            placeholder="John"
             :new-value="firstname"
         ></debounced-input>
       </div>
@@ -17,7 +17,7 @@
         </label>
         <debounced-input
             id="bi-lastname"
-            placeholder="your-email@gmail.com"
+            placeholder="Doe"
             :new-value="lastname"
         ></debounced-input>
       </div>
