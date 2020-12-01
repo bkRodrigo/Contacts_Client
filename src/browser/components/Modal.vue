@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="relative z-40">
     <!--Toggle Button-->
     <button
         v-html="toggleText"

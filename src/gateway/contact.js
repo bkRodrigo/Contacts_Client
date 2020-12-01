@@ -16,7 +16,13 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', jsonParser, (req, res) => {
-  apiClient.post('/address', req.body).then((apiRes) => res.json(apiRes));
+  apiClient.post('/contact', req.body).then((apiRes) => res.json(apiRes));
+});
+
+router.delete('/:id', jsonParser, (req, res) => {
+  const path = req.originalUrl.replace('/api', '');
+
+  apiClient.delete(path).then((apiRes) => res.json(apiRes));
 });
 
 module.exports = router;

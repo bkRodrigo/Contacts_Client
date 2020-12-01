@@ -1,5 +1,9 @@
 const axios = require('axios');
 
+const FormData = require('form-data');
+
+const { defaultFile } = require('./encodedImg');
+
 class ApiClient {
   constructor() {
     this.apiHost = process.env.API_HOST;
@@ -20,6 +24,18 @@ class ApiClient {
     }));
   }
 
+  getFile(endpoint) {
+    const uri = `${this.apiHost}${endpoint}`;
+
+    return axios.get(uri, { responseType: 'arraybuffer' }).then((res) => ({
+      error: false,
+      encoded: Buffer.from(res.data, 'binary').toString('base64'),
+    })).catch(() => ({
+      error: true,
+      encoded: defaultFile.encoded,
+    }));
+  }
+
   post(endpoint, body) {
     const uri = `${this.apiHost}${endpoint}`;
 
@@ -31,6 +47,43 @@ class ApiClient {
       error: true,
       status: error.response.status,
       statusText: error.toJSON().message,
+      data: {},
+    }));
+  }
+
+  delete(endpoint) {
+    const uri = `${this.apiHost}${endpoint}`;
+    console.log(uri);
+    return axios.delete(uri).then((res) => ({
+      error: false,
+      status: 200,
+      data: res.data || {},
+    })).catch((error) => ({
+      error: true,
+      status: error.response.status,
+      statusText: error.toJSON().message,
+      data: {},
+    }));
+  }
+
+  postMedia(endpoint, req) {
+    const uri = `${this.apiHost}${endpoint}`,
+      formData = new FormData();
+
+    formData.append('photo', req.file.buffer, req.file.originalname);
+
+    const config = {
+      headers: formData.getHeaders(),
+    };
+
+    return axios.post(uri, formData, config).then((res) => ({
+      error: false,
+      status: 200,
+      data: res.data || {},
+    })).catch((error) => ({
+      error: true,
+      status: error.response.status,
+      statusText: error.response.statusText,
       data: {},
     }));
   }

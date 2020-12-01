@@ -39,4 +39,14 @@ body.modal-active {
     .btn-gray:active {
         @apply bg-gray-500;
     }
+
+    .btn-red {
+        @apply bg-red-400 text-white;
+    }
+    .btn-red:hover {
+        @apply bg-red-300;
+    }
+    .btn-red:active {
+        @apply bg-red-500;
+    }
 }
