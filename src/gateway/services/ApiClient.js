@@ -18,7 +18,7 @@ class ApiClient {
       data: res.data || {},
     })).catch((error) => ({
       error: true,
-      status: error.response.status,
+      status: 500,
       statusText: error.toJSON().message,
       data: {},
     }));
@@ -45,7 +45,7 @@ class ApiClient {
       data: res.data || {},
     })).catch((error) => ({
       error: true,
-      status: error.response.status,
+      status: 500,
       statusText: error.toJSON().message,
       data: {},
     }));
@@ -53,14 +53,14 @@ class ApiClient {
 
   delete(endpoint) {
     const uri = `${this.apiHost}${endpoint}`;
-    console.log(uri);
+
     return axios.delete(uri).then((res) => ({
       error: false,
       status: 200,
       data: res.data || {},
     })).catch((error) => ({
       error: true,
-      status: error.response.status,
+      status: 500,
       statusText: error.toJSON().message,
       data: {},
     }));
