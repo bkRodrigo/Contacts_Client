@@ -130,7 +130,8 @@ export default {
             return;
           }
 
-          const results = res.data.data;
+          const results = res.data.data,
+            registeredItems = [];
 
           if (results.meta.total === 0) {
             return;
@@ -143,11 +144,15 @@ export default {
               return items;
             }
 
-            const key = vm.resultsKey || 'name';
+            const finalText = vm.getTextFromItem(vm.resultsKey || 'name', item);
 
+            if (registeredItems.indexOf(finalText) !== -1) {
+              return items;
+            }
+            registeredItems.push(finalText);
             items.push({
               id: itemCnt,
-              text: item[key],
+              text: vm.getTextFromItem(vm.resultsKey || 'name', item),
               highlight: false,
             });
             itemCnt++;
@@ -159,6 +164,14 @@ export default {
         .catch(() => {
           vm.search.waiting = false;
         });
+    },
+
+    getTextFromItem(keys, item) {
+      const keyParts = keys.split('.');
+
+      return keyParts.reduce((resolvedText, keyPart) => (
+        resolvedText[keyPart] ? resolvedText[keyPart] : ''
+      ), item);
     },
 
     resetResultsAndState() {

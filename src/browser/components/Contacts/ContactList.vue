@@ -1,6 +1,40 @@
 <template>
-  <div>
-    <div class="w-full flex justify-end items-end">
+  <div class="relative">
+    <div class="absolute pl-4 pb-2 right-0">
+      <button
+          @click="prevPage()"
+          class="btn btn-primary"
+      >Prev</button>
+      <button
+          @click="nextPage()"
+          class="btn btn-primary"
+      >Next</button>
+    </div>
+    <div class="w-full flex justify-between items-end">
+      <div class="p-2">
+        <label for="search-city" class="leading-7 text-sm text-gray-600 mt-2">
+          Search by City
+        </label>
+        <autofill-input
+            id="search-city"
+            search-endpoint="/contact/?search={}[city]&include=address"
+            results-key="address.city.name"
+            placeholder="City to search"
+            :new-value="search.city"
+        ></autofill-input>
+      </div>
+      <div class="p-2">
+        <label for="search-state" class="leading-7 text-sm text-gray-600 mt-2">
+          Search by State
+        </label>
+        <autofill-input
+            id="search-state"
+            search-endpoint="/contact/?search={}[state]&include=address"
+            results-key="address.state.name"
+            placeholder="State to search"
+            :new-value="search.state"
+        ></autofill-input>
+      </div>
       <div class="p-2">
         <label for="search-email" class="leading-7 text-sm text-gray-600 mt-2">
           Search by e-mail
@@ -27,16 +61,6 @@
       </div>
       <div class="pb-2">
         Viewing page <span v-html="currPage"></span> of <span v-html="getLastPage"></span>
-      </div>
-      <div class="pl-4 pb-2">
-        <button
-            @click="prevPage()"
-            class="btn btn-primary"
-        >Prev</button>
-        <button
-            @click="nextPage()"
-            class="btn btn-primary"
-        >Next</button>
       </div>
     </div>
     <table class="border-collapse w-full">
@@ -164,6 +188,8 @@ export default {
     search: {
       email: '',
       phone: '',
+      state: '',
+      city: '',
     },
   }),
 
@@ -203,26 +229,19 @@ export default {
 
   methods: {
     getContacts() {
-      let endpoint = `/api/contact?page=${this.getPage}&include=photo,phones`,
-        searchedByPhone = false;
+      let endpoint = `/api/contact?page=${this.getPage}&include=photo,phones`;
 
       if (this.search.email) {
         endpoint = `${endpoint}&search=${this.search.email}[email]`;
       }
       if (this.search.phone) {
-        searchedByPhone = true;
-        endpoint = `/api/phone/?page=${this.getPage}&include=contacts`;
-        endpoint += `&search=${this.search.phone}`;
+        endpoint = `${endpoint}&search=${this.search.phone}[phones]`;
       }
 
       ApiClient.get(endpoint)
         .then((res) => {
           this.meta = res.data.data.meta;
-          if (searchedByPhone) {
-            this.phonesResponseData(res.data.data.data);
-          } else {
-            this.contactsResponseData(res.data.data.data);
-          }
+          this.contacts = res.data.data.data;
         })
         .catch(() => {
           this.failedResponse();
@@ -233,35 +252,13 @@ export default {
       this.contacts = [];
     },
 
-    contactsResponseData(contacts) {
-      this.contacts = contacts;
-    },
-
-    phonesResponseData(phones) {
-      const contactIds = [];
-
-      this.contacts = Object.keys(phones).reduce((contacts, key) => {
-        const phone = phones[key];
-
-        if (!phone.contacts || phone.contacts.length === 0) {
-          return contacts;
-        }
-
-        const contactsToAdd = phone.contacts.reduce((newContacts, contact) => {
-          if (contactIds.indexOf(contact.id) !== -1) {
-            return newContacts;
-          }
-          contactIds.push(contact.id);
-          newContacts.push(contact);
-
-          return newContacts;
-        }, []);
-
-        return contacts.concat(contactsToAdd);
-      }, []);
-    },
-
     newSearch(data) {
+      if (data.id === 'search-city') {
+        this.citySearch(data.value);
+      }
+      if (data.id === 'search-state') {
+        this.stateSearch(data.value);
+      }
       if (data.id === 'search-email') {
         this.emailSearch(data.value);
       }
@@ -270,16 +267,36 @@ export default {
       }
     },
 
+    citySearch(value) {
+      this.currPage = this.getFirstPage;
+      this.search.email = '';
+      this.search.phone = '';
+      this.search.city = value;
+      this.search.state = '';
+      this.getContacts();
+    },
+    stateSearch(value) {
+      this.currPage = this.getFirstPage;
+      this.search.email = '';
+      this.search.phone = '';
+      this.search.city = '';
+      this.search.state = value;
+      this.getContacts();
+    },
     emailSearch(value) {
       this.currPage = this.getFirstPage;
       this.search.email = value;
       this.search.phone = '';
+      this.search.city = '';
+      this.search.state = '';
       this.getContacts();
     },
     phoneSearch(value) {
       this.currPage = this.getFirstPage;
       this.search.phone = value;
       this.search.email = '';
+      this.search.city = '';
+      this.search.state = '';
       this.getContacts();
     },
 
