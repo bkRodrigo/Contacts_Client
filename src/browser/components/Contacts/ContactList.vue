@@ -237,6 +237,12 @@ export default {
       if (this.search.phone) {
         endpoint = `${endpoint}&search=${this.search.phone}[phones]`;
       }
+      if (this.search.city) {
+        endpoint = `${endpoint}&search=${this.search.phone}[city]`;
+      }
+      if (this.search.state) {
+        endpoint = `${endpoint}&search=${this.search.phone}[state]`;
+      }
 
       ApiClient.get(endpoint)
         .then((res) => {
