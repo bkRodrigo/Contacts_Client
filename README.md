@@ -1,4 +1,4 @@
-# Kin + Carta Code Challenge
+# Code Challenge
 ## Contacts Client
 
 To get this running locally, use NVM to get the right version of node installed
